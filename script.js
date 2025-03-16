@@ -4,14 +4,14 @@ function setup() {
   makePageForEpisodes(allEpisodes);
 }
 
-function makePageForEpisodes(episodeList) {
-  const rootElem = document.getElementById("root");
-  rootElem.textContent = `Got ${episodeList.length} episode(s)`;
-}
+// function makePageForEpisodes(episodeList) {
+//   const rootElem = document.getElementById("root");
+//   rootElem.textContent = `Got ${episodeList.length} episode(s)`;
+// }
 
 window.onload = setup;
-//creating main div
 const allEpisodes = getAllEpisodes();
+//creating main div
 const mainDiv = document.createElement(`div`);
 document.body.appendChild(mainDiv);
 mainDiv.setAttribute(`id`, `mainDiv`);
@@ -21,9 +21,8 @@ function showEpisodes(episodes) {
     //creating div for each episodes
     const divEpisodes = document.createElement(`div`);
     divEpisodes.classList.add(`divEpisodes`);
-    // rendering title
     mainDiv.appendChild(divEpisodes);
-
+    // rendering title
     const name = document.createElement(`h1`);
     const seasons = episode.season.toString().padStart(2, `0`);
     const episodes = episode.number.toString().padStart(2, `0`);
@@ -36,7 +35,7 @@ function showEpisodes(episodes) {
     //rendering summary text
     divEpisodes.innerHTML += episode.summary;
   });
-  //creating footer
+  // creating footer
   const footer = document.createElement(`div`);
   footer.classList.add(`footer`);
   footer.innerHTML += `<p>Data has originally come from <a href ="https://tvmaze.com/" target="_blank">[TVMaze.com]</a></p>`;
