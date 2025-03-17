@@ -1,7 +1,7 @@
 //You can edit ALL of the code here
 function setup() {
   const allEpisodes = getAllEpisodes();
-  makePageForEpisodes(allEpisodes);
+  // makePageForEpisodes(allEpisodes);
 }
 
 // function makePageForEpisodes(episodeList) {
@@ -16,6 +16,7 @@ const mainDiv = document.createElement(`div`);
 document.body.appendChild(mainDiv);
 mainDiv.setAttribute(`id`, `mainDiv`);
 
+//rendering episodes
 function showEpisodes(episodes) {
   episodes.forEach((episode) => {
     //creating div for each episodes
@@ -35,11 +36,12 @@ function showEpisodes(episodes) {
     //rendering summary text
     divEpisodes.innerHTML += episode.summary;
   });
-  // creating footer
+}
+showEpisodes(allEpisodes);
+// creating footer
+function createFooter() {
   const footer = document.createElement(`div`);
   footer.classList.add(`footer`);
   footer.innerHTML += `<p>Data has originally come from <a href ="https://tvmaze.com/" target="_blank">[TVMaze.com]</a></p>`;
   document.body.appendChild(footer);
 }
-
-showEpisodes(allEpisodes);
