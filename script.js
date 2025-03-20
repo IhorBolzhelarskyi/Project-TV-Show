@@ -1,13 +1,5 @@
-function setup() {
-  const allEpisodes = getAllEpisodes();
-}
 
-window.onload = setup;
 const allEpisodes = getAllEpisodes();
-//creating main div
-const mainDiv = document.createElement(`div`);
-document.body.appendChild(mainDiv);
-mainDiv.setAttribute(`id`, `mainDiv`);
 
 //rendering episodes
 function showEpisodes(episodes) {
@@ -31,11 +23,3 @@ function showEpisodes(episodes) {
   });
 }
 showEpisodes(allEpisodes);
-// creating footer
-function createFooter() {
-  const footer = document.createElement(`div`);
-  footer.classList.add(`footer`);
-  footer.innerHTML += `<p>Data has originally come from <a href ="https://tvmaze.com/" target="_blank">[TVMaze.com]</a></p>`;
-  document.body.appendChild(footer);
-}
-createFooter();
