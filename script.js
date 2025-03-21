@@ -1,26 +1,26 @@
-"use strict";
-
 const allEpisodes = getAllEpisodes();
+// Declare a variable to store the search term
 let searchTerm = "";
 
-function addOptionToEpisodeSelector(episodes) {
-  const select = document.getElementById("episodeSelector")
+// add options to episodeSelector
+function populateEpisodeSelector(episodes) {
+  const select = document.getElementById("episodeSelector");
   episodes.forEach((episode) => {
     const option = document.createElement(`option`);
-    option.textContent = episode.name
-    option.value = `#${episode.id}`
-    
-    select.appendChild(option)
-  })
+    option.textContent = episode.name;
+    // Add id as a value for the callback function handling the onChange event
+    option.value = `#${episode.id}`;
+    select.appendChild(option);
+  });
 }
-addOptionToEpisodeSelector(allEpisodes)
+populateEpisodeSelector(allEpisodes);
 //rendering episodes
 function showEpisodes(episodes) {
   episodes.forEach((episode) => {
     //creating div for each episodes
     const divEpisodes = document.createElement(`div`);
     divEpisodes.classList.add(`divEpisodes`);
-    divEpisodes.setAttribute("id", `${episode.id}`)
+    divEpisodes.setAttribute("id", `${episode.id}`);
     mainDiv.appendChild(divEpisodes);
     // rendering title
     const name = document.createElement(`h1`);
@@ -36,11 +36,14 @@ function showEpisodes(episodes) {
     divEpisodes.innerHTML += episode.summary;
   });
 }
+// declare variable to store the amount of displayed episodes
+const episodesFound = document.getElementById("episodesFound");
+
 function render() {
-  const formattedSearchTerm = searchTerm.toLowerCase()
+  const formattedSearchTerm = searchTerm.toLowerCase();
   const filteredFilms = allEpisodes.filter(
     (film) =>
-      //added regexp to remove tags from summary, as the will affect filter results
+      //Added RegExp to remove tags from the summary, as they affect the filter results.
       film.name.toLowerCase().includes(formattedSearchTerm) ||
       film.summary
         .toLowerCase()
@@ -53,10 +56,11 @@ function render() {
     episodesFound.textContent = "No films found.";
     return;
   }
-
+  // clear previous result
   mainDiv.textContent = "";
   episodesFound.textContent = "";
   showEpisodes(filteredFilms);
+  // remove episodesFound if all episodes are shown
   if (filteredFilms.length === 73) {
     episodesFound.textContent = "";
   } else {
@@ -65,12 +69,11 @@ function render() {
 }
 
 const searchBox = document.getElementById("searchbar");
-const episodesFound = document.getElementById("episodesFound");
 searchBox.addEventListener("input", handleSearchInput);
 
 function handleSearchInput(event) {
   searchTerm = event.target.value;
   render();
 }
-render();
 
+render();
