@@ -1,4 +1,3 @@
-
 const allEpisodes = getAllEpisodes();
 
 //rendering episodes
