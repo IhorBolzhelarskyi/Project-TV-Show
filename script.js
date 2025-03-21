@@ -28,9 +28,9 @@ function render() {
   const formattedSearchTerm =
     searchTerm.charAt(0).toUpperCase() +
     searchTerm.slice(1).toLowerCase();
-
   const filteredFilms = allEpisodes.filter((film) =>
-    film.name.includes(formattedSearchTerm)
+    //added regexp to remove tags from summary, as the will affect filter results
+    film.name.includes(formattedSearchTerm) || film.summary.replace(/<\/?p>|<br\s*\/?>/g, "").includes(formattedSearchTerm)
   );
 
   if (filteredFilms.length === 0) {
