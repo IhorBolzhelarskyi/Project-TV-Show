@@ -1,4 +1,7 @@
+"use strict"
+
 const allEpisodes = getAllEpisodes();
+let searchTerm = "";
 
 //rendering episodes
 function showEpisodes(episodes) {
@@ -21,4 +24,29 @@ function showEpisodes(episodes) {
     divEpisodes.innerHTML += episode.summary;
   });
 }
-showEpisodes(allEpisodes);
+function render() {
+  const formattedSearchTerm =
+    searchTerm.charAt(0).toUpperCase() +
+    searchTerm.slice(1).toLowerCase();
+
+  const filteredFilms = allEpisodes.filter((film) =>
+    film.name.includes(formattedSearchTerm)
+  );
+
+  if (filteredFilms.length === 0) {
+    mainDiv.textContent = "No films found.";
+    return;
+  }
+  mainDiv.textContent = ""
+  showEpisodes(filteredFilms);
+}
+
+const searchBox = document.getElementById("search");
+
+searchBox.addEventListener("input", handleSearchInput);
+
+function handleSearchInput(event) {
+  searchTerm = event.target.value;
+  render();
+}
+render();
