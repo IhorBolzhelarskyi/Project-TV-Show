@@ -3,12 +3,24 @@
 const allEpisodes = getAllEpisodes();
 let searchTerm = "";
 
+function addOptionToEpisodeSelector(episodes) {
+  const select = document.getElementById("episodeSelector")
+  episodes.forEach((episode) => {
+    const option = document.createElement(`option`);
+    option.textContent = episode.name
+    option.value = `#${episode.id}`
+    
+    select.appendChild(option)
+  })
+}
+addOptionToEpisodeSelector(allEpisodes)
 //rendering episodes
 function showEpisodes(episodes) {
   episodes.forEach((episode) => {
     //creating div for each episodes
     const divEpisodes = document.createElement(`div`);
     divEpisodes.classList.add(`divEpisodes`);
+    divEpisodes.setAttribute("id", `${episode.id}`)
     mainDiv.appendChild(divEpisodes);
     // rendering title
     const name = document.createElement(`h1`);
@@ -61,3 +73,4 @@ function handleSearchInput(event) {
   render();
 }
 render();
+

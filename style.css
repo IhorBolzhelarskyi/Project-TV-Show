@@ -20,7 +20,11 @@ body {
   position: absolute;
   margin: 0px 0px 0px 450px;
 }
-
+#search select {
+  position: absolute;
+  /* margin: 0px 450px 0px 0px; */
+  left: 8%;
+}
 
 #mainDiv {
   display: grid;
