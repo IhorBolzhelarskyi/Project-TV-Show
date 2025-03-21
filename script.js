@@ -37,13 +37,13 @@ function showEpisodes(episodes) {
   });
 }
 function render() {
-  const formattedSearchTerm =
-    searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1).toLowerCase();
+  const formattedSearchTerm = searchTerm.toLowerCase()
   const filteredFilms = allEpisodes.filter(
     (film) =>
       //added regexp to remove tags from summary, as the will affect filter results
-      film.name.includes(formattedSearchTerm) ||
+      film.name.toLowerCase().includes(formattedSearchTerm) ||
       film.summary
+        .toLowerCase()
         .replace(/<\/?p>|<br\s*\/?>/g, "")
         .includes(formattedSearchTerm)
   );
