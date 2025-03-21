@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 const allEpisodes = getAllEpisodes();
 let searchTerm = "";
@@ -26,23 +26,34 @@ function showEpisodes(episodes) {
 }
 function render() {
   const formattedSearchTerm =
-    searchTerm.charAt(0).toUpperCase() +
-    searchTerm.slice(1).toLowerCase();
-  const filteredFilms = allEpisodes.filter((film) =>
-    //added regexp to remove tags from summary, as the will affect filter results
-    film.name.includes(formattedSearchTerm) || film.summary.replace(/<\/?p>|<br\s*\/?>/g, "").includes(formattedSearchTerm)
+    searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1).toLowerCase();
+  const filteredFilms = allEpisodes.filter(
+    (film) =>
+      //added regexp to remove tags from summary, as the will affect filter results
+      film.name.includes(formattedSearchTerm) ||
+      film.summary
+        .replace(/<\/?p>|<br\s*\/?>/g, "")
+        .includes(formattedSearchTerm)
   );
 
   if (filteredFilms.length === 0) {
-    mainDiv.textContent = "No films found.";
+    mainDiv.textContent = "";
+    episodesFound.textContent = "No films found.";
     return;
   }
-  mainDiv.textContent = ""
+
+  mainDiv.textContent = "";
+  episodesFound.textContent = "";
   showEpisodes(filteredFilms);
+  if (filteredFilms.length === 73) {
+    episodesFound.textContent = "";
+  } else {
+    episodesFound.textContent = `Displaying ${filteredFilms.length}/73 episodes`;
+  }
 }
 
-const searchBox = document.getElementById("search");
-
+const searchBox = document.getElementById("searchbar");
+const episodesFound = document.getElementById("episodesFound");
 searchBox.addEventListener("input", handleSearchInput);
 
 function handleSearchInput(event) {

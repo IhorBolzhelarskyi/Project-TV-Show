@@ -9,6 +9,19 @@ body {
   padding: 20px;
 }
 
+#search {
+  display: flex; 
+  position: relative;
+  justify-content: center;
+  width: 100%;
+}
+
+#search p {
+  position: absolute;
+  margin: 0px 0px 0px 450px;
+}
+
+
 #mainDiv {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
