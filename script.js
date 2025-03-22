@@ -7,7 +7,9 @@ function populateEpisodeSelector(episodes) {
   const select = document.getElementById("episodeSelector");
   episodes.forEach((episode) => {
     const option = document.createElement(`option`);
-    option.textContent = episode.name;
+    const seasons = episode.season.toString().padStart(2, `0`);
+    const episodes = episode.number.toString().padStart(2, `0`);
+    option.textContent = `S${seasons}E${episodes} - ${episode.name}`;
     // Add id as a value for the callback function handling the onChange event
     option.value = `#${episode.id}`;
     select.appendChild(option);
