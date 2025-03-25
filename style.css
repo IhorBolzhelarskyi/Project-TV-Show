@@ -67,15 +67,12 @@ body {
 .loading {
   background-image: url("https://i.gifer.com/7plU.gif");
   display: block;
-  width: 200px;
-  height: 200px;
+  width: 20em;
+  height: 20em;
+  background-size: cover;
 }
 .errorM {
   display: block;
   width: 200px;
   height: 200px;
-}
-
-.hide {
-  display: none;
 }

@@ -18,24 +18,17 @@ const fetchEpisodes = async function () {
     loadingImg.classList.add(`loading`);
     errorMessage.classList.remove(`errorM`);
     const response = await fetch("https://api.tvmaze.com/shows/82/episodes");
-
-    console.log(response);
     const data = await response.json();
-
-    console.log(data);
     if (!response.ok) {
-      console.log(response.status);
       throw new Error(`Error :${response.status}`);
     }
     return data;
   } catch (error) {
-    console.log(error);
     header.style.display = `none`;
     mainDiv.style.display = `none`;
     footer.style.display = `none`;
 
-    errorMessage.textContent = error.message || "Something went wrong while fetching episodes";
-    errorMessage.classList.add(`errorM`);
+    errorMessage.textContent = error.message;
   }
 };
 // updating episodeState.allEpisodes with data from API and rendering the episodes
