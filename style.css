@@ -64,3 +64,18 @@ body {
   color: #555;
   line-height: 1.4;
 }
+.loading {
+  background-image: url("https://i.gifer.com/7plU.gif");
+  display: block;
+  width: 200px;
+  height: 200px;
+}
+.errorM {
+  display: block;
+  width: 200px;
+  height: 200px;
+}
+
+.hide {
+  display: none;
+}
