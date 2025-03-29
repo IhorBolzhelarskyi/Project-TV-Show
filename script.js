@@ -1,9 +1,11 @@
 "use strict";
 const episodeState = {
+  allShows: [],
   allEpisodes: [],
   searchEpisodes: "",
 };
-const select = document.getElementById("episodeSelector");
+const selectShow = document.getElementById("showSelector");
+const selectEpisode = document.getElementById("episodeSelector");
 const loadingImg = document.querySelector(`#loadingImg`);
 const errorMessage = document.querySelector(`#errorMessage`);
 const mainDiv = document.getElementById("mainDiv");
@@ -11,6 +13,34 @@ const episodesFound = document.getElementById("episodesFound");
 const searchBox = document.getElementById("searchbar");
 const footer = document.querySelector(`#footer`);
 const header = document.querySelector(`#search`);
+
+//---------fetching shows from the API---------
+const fetchShows = async function () {
+  try {
+    loadingImg.classList.add(`loading`);
+    errorMessage.classList.remove(`errorM`);
+    const response = await fetch("https://api.tvmaze.com/shows");
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`Error :${response.status}`);
+    }
+    return data;
+  } catch (error) {
+    header.style.display = `none`;
+    mainDiv.style.display = `none`;
+    footer.style.display = `none`;
+
+    errorMessage.textContent = error.message;
+  }
+};
+// updating episodeState.allEpisodes with data from API and rendering the episodes
+fetchShows().then((data) => {
+  episodeState.allShows = data;
+  console.log(episodeState.allShows);
+  // loadingImg.classList.remove(`loading`);
+});
+
+// ---------//
 
 // fetching episodes from the API
 const fetchEpisodes = async function () {
@@ -47,7 +77,18 @@ function populateEpisodeSelector(episodes) {
     option.textContent = `S${seasons}E${episodes} - ${episode.name}`;
     // Add id as a value for the callback function handling the onChange event
     option.value = `#${episode.id}`;
-    select.appendChild(option);
+    selectEpisode.appendChild(option);
+  });
+}
+
+// add options to showSelector
+function populateShowSelector(shows) {
+  shows.forEach((show) => {
+    const option = document.createElement(`option`);
+    option.textContent = show.name;
+    option.value = show.id;
+    console.log(option);
+    selectShow.appendChild(option);
   });
 }
 
@@ -75,6 +116,7 @@ function showEpisodes(episodes) {
 }
 
 function render() {
+
   if (!episodeState.allEpisodes) {
     return;
   }
@@ -98,6 +140,7 @@ function render() {
   mainDiv.textContent = "";
   episodesFound.textContent = "";
   populateEpisodeSelector(episodeState.allEpisodes);
+  populateShowSelector(episodeState.allShows);
   showEpisodes(filteredFilms);
   // remove episodesFound if all episodes are shown
   if (filteredFilms.length === 73) {

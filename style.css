@@ -9,7 +9,7 @@ body {
   padding: 20px;
 }
 
-#search {
+/* #search {
   display: flex;
   position: relative;
   justify-content: center;
@@ -23,7 +23,7 @@ body {
 #search select {
   position: absolute;
   left: 8%;
-}
+} */
 
 #mainDiv {
   display: grid;
