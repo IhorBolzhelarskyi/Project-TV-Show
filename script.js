@@ -1,7 +1,7 @@
 "use strict";
 const episodeState = {
   allShows: [],
-  allEpisodes: [],
+  allEpisodes: {},
   searchEpisodes: "",
 };
 const selectShow = document.getElementById("showSelector");
@@ -36,18 +36,20 @@ const fetchShows = async function () {
 // updating episodeState.allEpisodes with data from API and rendering the episodes
 fetchShows().then((data) => {
   episodeState.allShows = data;
-  console.log(episodeState.allShows);
-  // loadingImg.classList.remove(`loading`);
+  updatingAllEpisodesList(episodeState.allShows[0].id)
+  console.log(episodeState.allEpisodes)
+  loadingImg.classList.remove(`loading`);
 });
 
 // ---------//
 
 // fetching episodes from the API
-const fetchEpisodes = async function () {
+const fetchEpisodes = async function (id) {
+  const showUrl = `https://api.tvmaze.com/shows/${id}/episodes`
   try {
     loadingImg.classList.add(`loading`);
     errorMessage.classList.remove(`errorM`);
-    const response = await fetch("https://api.tvmaze.com/shows/82/episodes");
+    const response = await fetch(showUrl);
     const data = await response.json();
     if (!response.ok) {
       throw new Error(`Error :${response.status}`);
@@ -62,11 +64,16 @@ const fetchEpisodes = async function () {
   }
 };
 // updating episodeState.allEpisodes with data from API and rendering the episodes
-fetchEpisodes().then((data) => {
+function updatingAllEpisodesList (id) {
+  fetchEpisodes(id).then((data) => {
   episodeState.allEpisodes = data;
+  console.log(episodeState.allEpisodes)
   loadingImg.classList.remove(`loading`);
   render();
 });
+} 
+
+
 
 // add options to episodeSelector
 function populateEpisodeSelector(episodes) {
@@ -87,7 +94,6 @@ function populateShowSelector(shows) {
     const option = document.createElement(`option`);
     option.textContent = show.name;
     option.value = show.id;
-    console.log(option);
     selectShow.appendChild(option);
   });
 }
@@ -139,6 +145,7 @@ function render() {
   // clear previous result
   mainDiv.textContent = "";
   episodesFound.textContent = "";
+  selectEpisode.innerHTML = ""
   populateEpisodeSelector(episodeState.allEpisodes);
   populateShowSelector(episodeState.allShows);
   showEpisodes(filteredFilms);
@@ -155,4 +162,14 @@ searchBox.addEventListener("input", handleSearchInput);
 function handleSearchInput(event) {
   episodeState.searchEpisodes = event.target.value;
   render();
+}
+
+selectShow.addEventListener("change", handleShowSelect);
+
+function handleShowSelect(event) {
+  const selectedShowId = event.target.value
+  console.log(selectedShowId)
+  console.log(episodeState.allEpisodes)
+  updatingAllEpisodesList(selectedShowId)
+
 }
