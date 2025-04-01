@@ -4,6 +4,7 @@ const episodeState = {
   allEpisodes: {},
   searchEpisodes: "",
 };
+
 const selectShow = document.getElementById("showSelector");
 const selectEpisode = document.getElementById("episodeSelector");
 const loadingImg = document.querySelector(`#loadingImg`);
@@ -33,18 +34,20 @@ const fetchShows = async function () {
     errorMessage.textContent = error.message;
   }
 };
-// updating episodeState.allEpisodes with data from API and rendering the episodes
+// update episodeState.allEpisodes with data from API and render the episodes
 fetchShows().then((data) => {
+  //sort data by name
+  data.sort((a, b) => (a.name > b.name ? 1 : -1));
   episodeState.allShows = data;
-  data.sort((a,b) => a.name >b.name)
-  console.log(data.sort((a,b) => a.name >b.name ? 1: -1))
+  populateShowSelector(episodeState.allShows);
+  //populate episode selector with the list of episodes from the first show
   updatingAllEpisodesList(episodeState.allShows[0].id);
   loadingImg.classList.remove(`loading`);
 });
 
 // ---------//
 
-// fetching episodes from the API
+// fetching episodes of the selected show from the API
 const fetchEpisodes = async function (id) {
   const showUrl = `https://api.tvmaze.com/shows/${id}/episodes`;
   try {
@@ -67,8 +70,10 @@ const fetchEpisodes = async function (id) {
 // updating episodeState.allEpisodes with data from API and rendering the episodes
 function updatingAllEpisodesList(id) {
   fetchEpisodes(id).then((data) => {
+    //add received list of episodes to the state
     episodeState.allEpisodes[id] = data;
     loadingImg.classList.remove(`loading`);
+    //now we have list of episodes, so we can render them
     render(id);
   });
 }
@@ -124,7 +129,7 @@ function render(id) {
     return;
   }
   const formattedSearchTerm = episodeState.searchEpisodes.toLowerCase();
-
+  // filter the episodes of the selected show
   const filteredFilms = episodeState.allEpisodes[id].filter(
     (film) =>
       //Added RegExp to remove tags from the summary, as they affect the filter results.
@@ -145,7 +150,6 @@ function render(id) {
   episodesFound.textContent = "";
   selectEpisode.innerHTML = "";
   populateEpisodeSelector(episodeState.allEpisodes[id]);
-  populateShowSelector(episodeState.allShows);
   showEpisodes(filteredFilms);
   episodesFound.textContent = `Displaying ${filteredFilms.length}/${episodeState.allEpisodes[id].length} episodes`;
 }
@@ -154,7 +158,6 @@ searchBox.addEventListener("input", handleSearchInput);
 
 function handleSearchInput(event) {
   episodeState.searchEpisodes = event.target.value;
-
   render(selectShow.value);
 }
 
@@ -162,6 +165,7 @@ selectShow.addEventListener("change", handleShowSelect);
 
 function handleShowSelect(event) {
   const selectedShowId = event.target.value;
+  //check if already we have the list of episodes of the selected show, and if no - fetch them
   if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
     render(selectedShowId);
   } else {
