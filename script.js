@@ -36,6 +36,8 @@ const fetchShows = async function () {
 // updating episodeState.allEpisodes with data from API and rendering the episodes
 fetchShows().then((data) => {
   episodeState.allShows = data;
+  data.sort((a,b) => a.name >b.name)
+  console.log(data.sort((a,b) => a.name >b.name ? 1: -1))
   updatingAllEpisodesList(episodeState.allShows[0].id);
   loadingImg.classList.remove(`loading`);
 });
