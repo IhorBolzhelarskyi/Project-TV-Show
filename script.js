@@ -116,9 +116,13 @@ function showEpisodes(episodes) {
     name.textContent = `${episode.name} - S${seasons}E${episodes}`;
     divEpisodes.appendChild(name);
     //rendering img
+
     const image = document.createElement(`img`);
-    image.src = episode.image.medium;
-    divEpisodes.appendChild(image);
+    if (episode.image) {
+      image.src = episode.image.medium;
+      divEpisodes.appendChild(image);
+    }
+
     //rendering summary text
     divEpisodes.innerHTML += episode.summary;
   });
