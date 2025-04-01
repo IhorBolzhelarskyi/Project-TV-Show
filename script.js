@@ -36,8 +36,7 @@ const fetchShows = async function () {
 // updating episodeState.allEpisodes with data from API and rendering the episodes
 fetchShows().then((data) => {
   episodeState.allShows = data;
-  updatingAllEpisodesList(episodeState.allShows[0].id)
-  console.log(episodeState.allEpisodes)
+  updatingAllEpisodesList(episodeState.allShows[0].id);
   loadingImg.classList.remove(`loading`);
 });
 
@@ -45,7 +44,7 @@ fetchShows().then((data) => {
 
 // fetching episodes from the API
 const fetchEpisodes = async function (id) {
-  const showUrl = `https://api.tvmaze.com/shows/${id}/episodes`
+  const showUrl = `https://api.tvmaze.com/shows/${id}/episodes`;
   try {
     loadingImg.classList.add(`loading`);
     errorMessage.classList.remove(`errorM`);
@@ -64,16 +63,13 @@ const fetchEpisodes = async function (id) {
   }
 };
 // updating episodeState.allEpisodes with data from API and rendering the episodes
-function updatingAllEpisodesList (id) {
+function updatingAllEpisodesList(id) {
   fetchEpisodes(id).then((data) => {
-  episodeState.allEpisodes = data;
-  console.log(episodeState.allEpisodes)
-  loadingImg.classList.remove(`loading`);
-  render();
-});
-} 
-
-
+    episodeState.allEpisodes[id] = data;
+    loadingImg.classList.remove(`loading`);
+    render(id);
+  });
+}
 
 // add options to episodeSelector
 function populateEpisodeSelector(episodes) {
@@ -121,13 +117,13 @@ function showEpisodes(episodes) {
   });
 }
 
-function render() {
-
+function render(id) {
   if (!episodeState.allEpisodes) {
     return;
   }
   const formattedSearchTerm = episodeState.searchEpisodes.toLowerCase();
-  const filteredFilms = episodeState.allEpisodes.filter(
+
+  const filteredFilms = episodeState.allEpisodes[id].filter(
     (film) =>
       //Added RegExp to remove tags from the summary, as they affect the filter results.
       film.name.toLowerCase().includes(formattedSearchTerm) ||
@@ -145,31 +141,28 @@ function render() {
   // clear previous result
   mainDiv.textContent = "";
   episodesFound.textContent = "";
-  selectEpisode.innerHTML = ""
-  populateEpisodeSelector(episodeState.allEpisodes);
+  selectEpisode.innerHTML = "";
+  populateEpisodeSelector(episodeState.allEpisodes[id]);
   populateShowSelector(episodeState.allShows);
   showEpisodes(filteredFilms);
-  // remove episodesFound if all episodes are shown
-  if (filteredFilms.length === 73) {
-    episodesFound.textContent = "";
-  } else {
-    episodesFound.textContent = `Displaying ${filteredFilms.length}/${episodeState.allEpisodes.length} episodes`;
-  }
+  episodesFound.textContent = `Displaying ${filteredFilms.length}/${episodeState.allEpisodes[id].length} episodes`;
 }
 
 searchBox.addEventListener("input", handleSearchInput);
 
 function handleSearchInput(event) {
   episodeState.searchEpisodes = event.target.value;
-  render();
+
+  render(selectShow.value);
 }
 
 selectShow.addEventListener("change", handleShowSelect);
 
 function handleShowSelect(event) {
-  const selectedShowId = event.target.value
-  console.log(selectedShowId)
-  console.log(episodeState.allEpisodes)
-  updatingAllEpisodesList(selectedShowId)
-
+  const selectedShowId = event.target.value;
+  if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
+    render(selectedShowId);
+  } else {
+    updatingAllEpisodesList(selectedShowId);
+  }
 }
