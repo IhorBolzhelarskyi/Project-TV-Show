@@ -25,7 +25,7 @@ body {
   left: 8%;
 } */
 
-#mainDiv {
+.mainDivEpisodes-view {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
@@ -75,4 +75,23 @@ body {
   display: block;
   width: 200px;
   height: 200px;
+}
+
+.mainDivShows-view {
+  display: flex;
+  flex-direction: column;
+}
+.showsContent {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+}
+.showsStatus {
+  background-color: red;
+  width: 20%;
+}
+
+.showsSummary {
+  width: 65%;
+  display: flex;
 }

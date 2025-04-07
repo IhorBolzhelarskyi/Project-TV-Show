@@ -40,9 +40,8 @@ fetchShows().then((data) => {
   data.sort((a, b) => (a.name > b.name ? 1 : -1));
   episodeState.allShows = data;
   populateShowSelector(episodeState.allShows);
-  //populate episode selector with the list of episodes from the first show
-  updatingAllEpisodesList(episodeState.allShows[0].id);
   loadingImg.classList.remove(`loading`);
+  showShows(episodeState.allShows);
 });
 
 // ---------//
@@ -101,8 +100,40 @@ function populateShowSelector(shows) {
   });
 }
 
+function showShows(shows) {
+  mainDiv.innerHTML = ``;
+  mainDiv.className = `mainDivShows-view`;
+  shows.forEach((show, index) => {
+    const html = `<section class="shows">
+        <div class="showsTitle"><h1>${show.name}</h1></div>
+        <div class="showsContent">
+        <div class="showsSummary">
+          <img class="showsImg" src="${show.image.medium}" />
+          ${show.summary}
+        </div>
+        <div class="showsStatus">
+          <h3 class="showsRating">
+            Rated<span>: ${show.rating.average}</span>
+          </h3>
+           <h3 class="showsRating">
+             Genres<span>: ${show.genres.join(` | `)}</span>
+           </h3>
+          <h3 class="showsRating">
+            Status<span>: ${show.status}</span>
+          </h3>
+          <h3 class="showsRating">
+            Runtime<span>: ${show.runtime}</span>
+          </h3>
+        </div>
+        </div>
+      </section>`;
+    mainDiv.insertAdjacentHTML(`afterbegin`, html);
+  });
+}
+
 //rendering episodes
 function showEpisodes(episodes) {
+  mainDiv.className = `mainDivEpisodes-view`;
   episodes.forEach((episode) => {
     //creating div for each episodes
     const divEpisodes = document.createElement(`section`);
