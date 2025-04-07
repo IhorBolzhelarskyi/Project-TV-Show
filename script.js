@@ -3,6 +3,7 @@ const episodeState = {
   allShows: [],
   allEpisodes: {},
   searchEpisodes: "",
+  switcher: true,
 };
 
 const selectShow = document.getElementById("showSelector");
@@ -41,7 +42,7 @@ fetchShows().then((data) => {
   episodeState.allShows = data;
   populateShowSelector(episodeState.allShows);
   loadingImg.classList.remove(`loading`);
-  showShows(episodeState.allShows);
+  renderShows(episodeState.allShows);
 });
 
 // ---------//
@@ -62,7 +63,6 @@ const fetchEpisodes = async function (id) {
     header.style.display = `none`;
     mainDiv.style.display = `none`;
     footer.style.display = `none`;
-
     errorMessage.textContent = error.message;
   }
 };
@@ -73,7 +73,7 @@ function updatingAllEpisodesList(id) {
     episodeState.allEpisodes[id] = data;
     loadingImg.classList.remove(`loading`);
     //now we have list of episodes, so we can render them
-    render(id);
+    renderEpisodes(id);
   });
 }
 
@@ -92,6 +92,10 @@ function populateEpisodeSelector(episodes) {
 
 // add options to showSelector
 function populateShowSelector(shows) {
+  const allShowsSelector = document.createElement(`option`);
+  allShowsSelector.textContent = `All Shows`;
+  allShowsSelector.value = 111111;
+  selectShow.prepend(allShowsSelector);
   shows.forEach((show) => {
     const option = document.createElement(`option`);
     option.textContent = show.name;
@@ -100,12 +104,13 @@ function populateShowSelector(shows) {
   });
 }
 
+//rendering shows
 function showShows(shows) {
   mainDiv.innerHTML = ``;
   mainDiv.className = `mainDivShows-view`;
-  shows.forEach((show, index) => {
+  shows.forEach((show) => {
     const html = `<section class="shows">
-        <div class="showsTitle"><h1>${show.name}</h1></div>
+        <div class="showsTitle"><h1 id="${show.id}">${show.name}</h1></div>
         <div class="showsContent">
         <div class="showsSummary">
           <img class="showsImg" src="${show.image.medium}" />
@@ -129,8 +134,39 @@ function showShows(shows) {
       </section>`;
     mainDiv.insertAdjacentHTML(`afterbegin`, html);
   });
+  const titles = document.querySelectorAll(`.showsTitle`);
+  titles.forEach((title) => {
+    title.addEventListener(`click`, (e) => {
+      const selectedShowId = e.target.id;
+      episodeState.switcher = false;
+      mainDiv.innerHTML = ``;
+      selectShow.value = selectedShowId;
+
+      if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
+        renderEpisodes(selectedShowId);
+      } else {
+        updatingAllEpisodesList(selectedShowId);
+      }
+      episodeState.searchEpisodes = "";
+      searchBox.value = "";
+    });
+  });
 }
 
+function renderShows(shows) {
+  episodeState.switcher = true;
+  const formattedSearchTerm = episodeState.searchEpisodes.toLocaleLowerCase();
+  const filteredShows = shows.filter((show) => {
+    const genresString = show.genres.join(" ").toLowerCase();
+    return (
+      show.name.toLowerCase().includes(formattedSearchTerm) ||
+      genresString.toLowerCase().includes(formattedSearchTerm) ||
+      show.summary.toLocaleLowerCase().includes(formattedSearchTerm)
+    );
+  });
+  showShows(filteredShows);
+  episodesFound.textContent = `found ${filteredShows.length} shows`;
+}
 //rendering episodes
 function showEpisodes(episodes) {
   mainDiv.className = `mainDivEpisodes-view`;
@@ -159,10 +195,11 @@ function showEpisodes(episodes) {
   });
 }
 
-function render(id) {
+function renderEpisodes(id) {
   if (!episodeState.allEpisodes) {
     return;
   }
+  episodeState.switcher = false;
   const formattedSearchTerm = episodeState.searchEpisodes.toLowerCase();
   // filter the episodes of the selected show
   const filteredFilms = episodeState.allEpisodes[id].filter(
@@ -192,18 +229,35 @@ function render(id) {
 searchBox.addEventListener("input", handleSearchInput);
 
 function handleSearchInput(event) {
-  episodeState.searchEpisodes = event.target.value;
-  render(selectShow.value);
+  if (!episodeState.switcher) {
+    episodeState.searchEpisodes = event.target.value.trim();
+    console.log(selectShow.value);
+    renderEpisodes(selectShow.value);
+    console.log(selectShow.value);
+  } else {
+    episodeState.searchEpisodes = event.target.value.trim();
+    renderShows(episodeState.allShows);
+  }
 }
 
 selectShow.addEventListener("change", handleShowSelect);
 
 function handleShowSelect(event) {
   const selectedShowId = event.target.value;
-  //check if already we have the list of episodes of the selected show, and if no - fetch them
-  if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
-    render(selectedShowId);
+  episodeState.searchEpisodes = "";
+  searchBox.value = "";
+  console.log(selectedShowId);
+  if (selectedShowId === `111111`) {
+    renderShows(episodeState.allShows);
   } else {
-    updatingAllEpisodesList(selectedShowId);
+    console.log(`qwrqwrqwrw`);
+    if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
+      //check if already we have the list of episodes of the selected show, and if no - fetch them
+      renderEpisodes(selectedShowId);
+    } else {
+      updatingAllEpisodesList(selectedShowId);
+    }
   }
 }
+
+console.log(episodeState.switcher);
