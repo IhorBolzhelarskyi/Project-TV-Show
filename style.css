@@ -9,21 +9,12 @@ body {
   padding: 20px;
 }
 
-/* #search {
+#search {
   display: flex;
-  position: relative;
-  justify-content: center;
-  width: 100%;
+  height: auto;
+  align-items: center;
+  gap: 1rem;
 }
-
-#search p {
-  position: absolute;
-  margin: 0px 0px 0px 450px;
-}
-#search select {
-  position: absolute;
-  left: 8%;
-} */
 
 .mainDivEpisodes-view {
   display: grid;

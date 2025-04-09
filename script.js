@@ -1,6 +1,7 @@
 "use strict";
 const episodeState = {
   allShows: [],
+  showsCast: [],
   allEpisodes: {},
   searchEpisodes: "",
   switcher: true,
@@ -23,6 +24,7 @@ const fetchShows = async function () {
     errorMessage.classList.remove(`errorM`);
     const response = await fetch("https://api.tvmaze.com/shows");
     const data = await response.json();
+    console.log(data);
     if (!response.ok) {
       throw new Error(`Error :${response.status}`);
     }
@@ -35,6 +37,16 @@ const fetchShows = async function () {
     errorMessage.textContent = error.message;
   }
 };
+
+// async function fetchShowCast() {
+//   const response = await fetch(`http://api.tvmaze.com/shows/1?embed=cast`);
+//   const data = await response.json();
+//   console.log(data);
+//   return data;
+// }
+// fetchShowCast().then((data) => {
+//   episodeState.showsCast = data;
+// });
 // update episodeState.allEpisodes with data from API and render the episodes
 fetchShows().then((data) => {
   //sort data by name
@@ -154,6 +166,7 @@ function showShows(shows) {
 }
 
 function renderShows(shows) {
+  selectEpisode.style.display = `none`;
   episodeState.switcher = true;
   const formattedSearchTerm = episodeState.searchEpisodes.toLocaleLowerCase();
   const filteredShows = shows.filter((show) => {
@@ -199,6 +212,7 @@ function renderEpisodes(id) {
   if (!episodeState.allEpisodes) {
     return;
   }
+  selectEpisode.style.display = `inline`;
   episodeState.switcher = false;
   const formattedSearchTerm = episodeState.searchEpisodes.toLowerCase();
   // filter the episodes of the selected show
@@ -231,9 +245,7 @@ searchBox.addEventListener("input", handleSearchInput);
 function handleSearchInput(event) {
   if (!episodeState.switcher) {
     episodeState.searchEpisodes = event.target.value.trim();
-    console.log(selectShow.value);
     renderEpisodes(selectShow.value);
-    console.log(selectShow.value);
   } else {
     episodeState.searchEpisodes = event.target.value.trim();
     renderShows(episodeState.allShows);
@@ -250,7 +262,6 @@ function handleShowSelect(event) {
   if (selectedShowId === `111111`) {
     renderShows(episodeState.allShows);
   } else {
-    console.log(`qwrqwrqwrw`);
     if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
       //check if already we have the list of episodes of the selected show, and if no - fetch them
       renderEpisodes(selectedShowId);
@@ -259,5 +270,3 @@ function handleShowSelect(event) {
     }
   }
 }
-
-console.log(episodeState.switcher);
