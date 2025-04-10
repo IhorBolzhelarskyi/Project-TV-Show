@@ -86,3 +86,15 @@ body {
   width: 65%;
   display: flex;
 }
+
+.showsTitle {
+  cursor: pointer;
+}
+
+.showsImg {
+  cursor: pointer;
+}
+
+.cast {
+  cursor: pointer;
+}

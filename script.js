@@ -1,7 +1,7 @@
 "use strict";
 const episodeState = {
   allShows: [],
-  showsCast: [],
+  allCast: {},
   allEpisodes: {},
   searchEpisodes: "",
   switcher: true,
@@ -16,6 +16,7 @@ const episodesFound = document.getElementById("episodesFound");
 const searchBox = document.getElementById("searchbar");
 const footer = document.querySelector(`#footer`);
 const header = document.querySelector(`#search`);
+const listOfCast = document.querySelectorAll(`cast`);
 
 //---------fetching shows from the API---------
 const fetchShows = async function () {
@@ -23,11 +24,11 @@ const fetchShows = async function () {
     loadingImg.classList.add(`loading`);
     errorMessage.classList.remove(`errorM`);
     const response = await fetch("https://api.tvmaze.com/shows");
-    const data = await response.json();
-    console.log(data);
     if (!response.ok) {
       throw new Error(`Error :${response.status}`);
     }
+    const data = await response.json();
+
     return data;
   } catch (error) {
     header.style.display = `none`;
@@ -37,16 +38,6 @@ const fetchShows = async function () {
     errorMessage.textContent = error.message;
   }
 };
-
-// async function fetchShowCast() {
-//   const response = await fetch(`http://api.tvmaze.com/shows/1?embed=cast`);
-//   const data = await response.json();
-//   console.log(data);
-//   return data;
-// }
-// fetchShowCast().then((data) => {
-//   episodeState.showsCast = data;
-// });
 // update episodeState.allEpisodes with data from API and render the episodes
 fetchShows().then((data) => {
   //sort data by name
@@ -57,6 +48,36 @@ fetchShows().then((data) => {
   renderShows(episodeState.allShows);
 });
 
+// fetching cast data from API
+// async function fetchCast(id) {
+//   try {
+//     const response = await fetch(`http://api.tvmaze.com/shows/${id}?embed=cast`);
+//     if (!response.ok) {
+//       throw new Error(`Error: ${response.status}`);
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     errorMessage.textContent = error.message;
+//   }
+// }
+// // saving data from API in object episodeState.allCast
+// async function updatingCastForShows(id) {
+//   const castData = await fetchCast(id);
+//   episodeState.allCast[id] = castData;
+//   console.log(episodeState.allCast);
+// }
+// updatingCastForShows(1);
+// console.log(episodeState.allCast);
+// function renderCastForShows(id) {
+//   const actors = episodeState.allCast[id]._embedded.cast;
+//   actors.forEach((cast) => {
+//     const nameOfActor = document.createElement(`h3`);
+//     nameOfActor.textContent = `${cast.person.name}`;
+//     listOfCast.appendChild(nameOfActor);
+//   });
+// }
+// renderCastForShows(1);
 // ---------//
 
 // fetching episodes of the selected show from the API
@@ -122,10 +143,10 @@ function showShows(shows) {
   mainDiv.className = `mainDivShows-view`;
   shows.forEach((show) => {
     const html = `<section class="shows">
-        <div class="showsTitle"><h1 id="${show.id}">${show.name}</h1></div>
+        <div><h1 class="showsTitle" data-id="${show.id}">${show.name}</h1></div>
         <div class="showsContent">
         <div class="showsSummary">
-          <img class="showsImg" src="${show.image.medium}" />
+          <img class="showsImg" data-id="${show.id}" src="${show.image.medium}" />
           ${show.summary}
         </div>
         <div class="showsStatus">
@@ -141,27 +162,37 @@ function showShows(shows) {
           <h3 class="showsRating">
             Runtime<span>: ${show.runtime}</span>
           </h3>
-        </div>
+          <h3 class="showsRating cast" >
+            list of actors
+          </h3>
+          <div data-id=${show.id} class="listOfCast"></div>
+        </div>  
         </div>
       </section>`;
     mainDiv.insertAdjacentHTML(`afterbegin`, html);
   });
   const titles = document.querySelectorAll(`.showsTitle`);
-  titles.forEach((title) => {
-    title.addEventListener(`click`, (e) => {
-      const selectedShowId = e.target.id;
-      episodeState.switcher = false;
-      mainDiv.innerHTML = ``;
-      selectShow.value = selectedShowId;
+  const imgs = document.querySelectorAll(`.showsImg`);
 
-      if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
-        renderEpisodes(selectedShowId);
-      } else {
-        updatingAllEpisodesList(selectedShowId);
-      }
-      episodeState.searchEpisodes = "";
-      searchBox.value = "";
-    });
+  const clickOnShow = (e) => {
+    const selectedShowId = e.target.dataset.id;
+    episodeState.switcher = false;
+    mainDiv.innerHTML = ``;
+    selectShow.value = selectedShowId;
+
+    if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
+      renderEpisodes(selectedShowId);
+    } else {
+      updatingAllEpisodesList(selectedShowId);
+    }
+    episodeState.searchEpisodes = "";
+    searchBox.value = "";
+  };
+  titles.forEach((title) => {
+    title.addEventListener(`click`, clickOnShow);
+  });
+  imgs.forEach((img) => {
+    img.addEventListener(`click`, clickOnShow);
   });
 }
 
@@ -180,6 +211,7 @@ function renderShows(shows) {
   showShows(filteredShows);
   episodesFound.textContent = `found ${filteredShows.length} shows`;
 }
+
 //rendering episodes
 function showEpisodes(episodes) {
   mainDiv.className = `mainDivEpisodes-view`;
