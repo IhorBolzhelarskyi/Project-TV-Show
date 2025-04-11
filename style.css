@@ -73,12 +73,12 @@ body {
   flex-direction: column;
 }
 .showsContent {
+  position: relative;
   display: flex;
   gap: 15px;
   width: 100%;
 }
 .showsStatus {
-  background-color: red;
   width: 20%;
 }
 
@@ -87,14 +87,34 @@ body {
   display: flex;
 }
 
-.showsTitle {
-  cursor: pointer;
-}
-
-.showsImg {
-  cursor: pointer;
-}
-
 .cast {
   cursor: pointer;
+  text-decoration: underline;
+}
+
+.hide {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.show {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+
+.listOfCast {
+  position: absolute;
+  z-index: 10;
+  background-color: aqua;
+}
+
+.cursorPointer {
+  cursor: pointer;
+}
+
+.showsTitle:hover,
+.showsRatingCast:hover {
+  text-decoration: underline;
 }

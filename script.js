@@ -17,6 +17,7 @@ const searchBox = document.getElementById("searchbar");
 const footer = document.querySelector(`#footer`);
 const header = document.querySelector(`#search`);
 const listOfCast = document.querySelectorAll(`cast`);
+console.log(listOfCast);
 
 //---------fetching shows from the API---------
 const fetchShows = async function () {
@@ -39,45 +40,63 @@ const fetchShows = async function () {
   }
 };
 // update episodeState.allEpisodes with data from API and render the episodes
-fetchShows().then((data) => {
-  //sort data by name
-  data.sort((a, b) => (a.name > b.name ? 1 : -1));
+// fetchShows().then((data) => {
+//   //sort data by name
+//   console.log(data);
+//   data.sort((a, b) => b.name.localeCompare(a.name));
+//   episodeState.allShows = data;
+//   populateShowSelector(episodeState.allShows);
+//   loadingImg.classList.remove(`loading`);
+//   renderShows(episodeState.allShows);
+//   // updatingCastForShows(124);
+// });
+async function updateShows() {
+  const data = await fetchShows();
+  data.sort((a, b) => b.name.localeCompare(a.name));
   episodeState.allShows = data;
   populateShowSelector(episodeState.allShows);
   loadingImg.classList.remove(`loading`);
   renderShows(episodeState.allShows);
-});
-
+  // updatingCastForShows(124);
+}
+updateShows();
 // fetching cast data from API
-// async function fetchCast(id) {
-//   try {
-//     const response = await fetch(`http://api.tvmaze.com/shows/${id}?embed=cast`);
-//     if (!response.ok) {
-//       throw new Error(`Error: ${response.status}`);
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     errorMessage.textContent = error.message;
-//   }
-// }
-// // saving data from API in object episodeState.allCast
-// async function updatingCastForShows(id) {
-//   const castData = await fetchCast(id);
-//   episodeState.allCast[id] = castData;
-//   console.log(episodeState.allCast);
-// }
-// updatingCastForShows(1);
-// console.log(episodeState.allCast);
-// function renderCastForShows(id) {
-//   const actors = episodeState.allCast[id]._embedded.cast;
-//   actors.forEach((cast) => {
-//     const nameOfActor = document.createElement(`h3`);
-//     nameOfActor.textContent = `${cast.person.name}`;
-//     listOfCast.appendChild(nameOfActor);
-//   });
-// }
-// renderCastForShows(1);
+async function fetchCast(id) {
+  try {
+    const response = await fetch(`http://api.tvmaze.com/shows/${id}?embed=cast`);
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    errorMessage.textContent = error.message;
+  }
+}
+// saving data from API in object episodeState.allCast
+async function updatingCastForShows(id) {
+  const castData = await fetchCast(id);
+  episodeState.allCast[id] = castData;
+  renderCastForShows(id);
+  // console.log(episodeState.allCast);
+}
+console.log(episodeState.allCast);
+function renderCastForShows(id) {
+  const castList = document.querySelector(`#cast${id}`);
+  console.log(castList);
+  // console.log(castList);
+  const castArray = episodeState.allCast[id]?._embedded?.cast;
+  console.log(castArray);
+  const seenName = new Set();
+  castArray.forEach((actor) => {
+    if (!seenName.has(actor.person.name)) {
+      seenName.add(actor.person.name);
+      const nameOfActor = document.createElement(`p`);
+      nameOfActor.textContent = actor.person.name;
+      castList.appendChild(nameOfActor);
+    }
+  });
+}
 // ---------//
 
 // fetching episodes of the selected show from the API
@@ -143,10 +162,10 @@ function showShows(shows) {
   mainDiv.className = `mainDivShows-view`;
   shows.forEach((show) => {
     const html = `<section class="shows">
-        <div><h1 class="showsTitle" data-id="${show.id}">${show.name}</h1></div>
+        <div><h1 class="showsTitle cursorPointer" data-id="${show.id}">${show.name}</h1></div>
         <div class="showsContent">
         <div class="showsSummary">
-          <img class="showsImg" data-id="${show.id}" src="${show.image.medium}" />
+          <img class="showsImg cursorPointer" data-id="${show.id}" src="${show.image.medium}" />
           ${show.summary}
         </div>
         <div class="showsStatus">
@@ -162,10 +181,10 @@ function showShows(shows) {
           <h3 class="showsRating">
             Runtime<span>: ${show.runtime}</span>
           </h3>
-          <h3 class="showsRating cast" >
-            list of actors
+          <h3 class="showsRatingCast cursorPointer" data-id="${show.id}" >
+            list of actors ➜
           </h3>
-          <div data-id=${show.id} class="listOfCast"></div>
+          <div id=cast${show.id} class="listOfCast hide"></div>
         </div>  
         </div>
       </section>`;
@@ -173,6 +192,8 @@ function showShows(shows) {
   });
   const titles = document.querySelectorAll(`.showsTitle`);
   const imgs = document.querySelectorAll(`.showsImg`);
+  const listOfCast = document.querySelectorAll(`.showsRatingCast`);
+  console.log(listOfCast);
 
   const clickOnShow = (e) => {
     const selectedShowId = e.target.dataset.id;
@@ -193,6 +214,21 @@ function showShows(shows) {
   });
   imgs.forEach((img) => {
     img.addEventListener(`click`, clickOnShow);
+  });
+  listOfCast.forEach((cast) => {
+    cast.addEventListener(`click`, (e) => {
+      const castId = e.target.dataset.id;
+      const div = document.querySelector(`#cast${castId}`);
+      div.innerHTML = "";
+      if (Object.keys(episodeState.allCast).includes(castId)) {
+        renderCastForShows(castId);
+      } else {
+        updatingCastForShows(castId);
+      }
+      console.log(div);
+      div.classList.toggle(`hide`);
+      div.classList.toggle(`show`);
+    });
   });
 }
 
