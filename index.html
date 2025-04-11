@@ -13,10 +13,16 @@
     <div id="loadingImg"></div>
     <div id="errorMessage"></div>
     <header id="search">
-      <select id ="showSelector"></select>
+      <select id="showSelector"></select>
       <select onChange="window.location.href=this.value" id="episodeSelector"></select>
       <label>Search <input type="text" id="searchbar" /></label>
       <p id="episodesFound"></p>
+      <select id="sortShows">
+        <option value="up">A-Z</option>
+        <option value="down">Z-A</option>
+        <option value="ratingUp">Rating 🠕</option>
+        <option value="ratingDown">Rating ↓</option>
+      </select>
     </header>
     <!-- End of container for search function -->
     <main id="mainDiv"></main>

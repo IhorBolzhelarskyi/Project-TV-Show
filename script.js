@@ -16,8 +16,7 @@ const episodesFound = document.getElementById("episodesFound");
 const searchBox = document.getElementById("searchbar");
 const footer = document.querySelector(`#footer`);
 const header = document.querySelector(`#search`);
-const listOfCast = document.querySelectorAll(`cast`);
-console.log(listOfCast);
+const selectSortShow = document.querySelector(`#sortShows`);
 
 //---------fetching shows from the API---------
 const fetchShows = async function () {
@@ -39,25 +38,15 @@ const fetchShows = async function () {
     errorMessage.textContent = error.message;
   }
 };
-// update episodeState.allEpisodes with data from API and render the episodes
-// fetchShows().then((data) => {
-//   //sort data by name
-//   console.log(data);
-//   data.sort((a, b) => b.name.localeCompare(a.name));
-//   episodeState.allShows = data;
-//   populateShowSelector(episodeState.allShows);
-//   loadingImg.classList.remove(`loading`);
-//   renderShows(episodeState.allShows);
-//   // updatingCastForShows(124);
-// });
 async function updateShows() {
   const data = await fetchShows();
-  data.sort((a, b) => b.name.localeCompare(a.name));
-  episodeState.allShows = data;
+  // data.sort((a, b) => a.name.localeCompare(b.name));
+  const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+  episodeState.allShows = sortedData;
+  console.log(episodeState.allShows);
   populateShowSelector(episodeState.allShows);
   loadingImg.classList.remove(`loading`);
-  renderShows(episodeState.allShows);
-  // updatingCastForShows(124);
+  renderShows([...episodeState.allShows].sort((a, b) => b.name.localeCompare(a.name)));
 }
 updateShows();
 // fetching cast data from API
@@ -80,7 +69,6 @@ async function updatingCastForShows(id) {
   renderCastForShows(id);
   // console.log(episodeState.allCast);
 }
-console.log(episodeState.allCast);
 function renderCastForShows(id) {
   const castList = document.querySelector(`#cast${id}`);
   console.log(castList);
@@ -125,6 +113,7 @@ function updatingAllEpisodesList(id) {
     episodeState.allEpisodes[id] = data;
     loadingImg.classList.remove(`loading`);
     //now we have list of episodes, so we can render them
+
     renderEpisodes(id);
   });
 }
@@ -193,7 +182,6 @@ function showShows(shows) {
   const titles = document.querySelectorAll(`.showsTitle`);
   const imgs = document.querySelectorAll(`.showsImg`);
   const listOfCast = document.querySelectorAll(`.showsRatingCast`);
-  console.log(listOfCast);
 
   const clickOnShow = (e) => {
     const selectedShowId = e.target.dataset.id;
@@ -338,3 +326,24 @@ function handleShowSelect(event) {
     }
   }
 }
+
+selectSortShow.addEventListener(`change`, (e) => {
+  const selectorValue = e.target.value;
+  switch (selectorValue) {
+    case "up":
+      const sortedAz = [...episodeState.allShows].sort((a, b) => b.name.localeCompare(a.name));
+      renderShows(sortedAz);
+      break;
+    case "down":
+      const sortedZa = [...episodeState.allShows].sort((a, b) => a.name.localeCompare(b.name));
+      renderShows(sortedZa);
+      break;
+    case "ratingUp":
+      const sortedRatingUp = [...episodeState.allShows].sort((a, b) => a.rating.average - b.rating.average);
+      renderShows(sortedRatingUp);
+      break;
+    case "ratingDown":
+      const sortedRatingDown = [...episodeState.allShows].sort((a, b) => b.rating.average - a.rating.average);
+      renderShows(sortedRatingDown);
+  }
+});
