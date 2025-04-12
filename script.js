@@ -17,6 +17,7 @@ const searchBox = document.getElementById("searchbar");
 const footer = document.querySelector(`#footer`);
 const header = document.querySelector(`#search`);
 const selectSortShow = document.querySelector(`#sortShows`);
+// const summaryElement =
 
 //---------fetching shows from the API---------
 const fetchShows = async function () {
@@ -155,14 +156,14 @@ function showShows(shows) {
         <div class="showsContent">
         <div class="showsSummary">
           <img class="showsImg cursorPointer" data-id="${show.id}" src="${show.image.medium}" />
-          ${show.summary}
+          <div class="summaryText" id="summary${show.id}">${show.summary}</div>
         </div>
         <div class="showsStatus">
           <h3 class="showsRating">
-            Rated<span>: ${show.rating.average}</span>
+            Rated<span>: ${show.rating.average ?? `-`}</span>
           </h3>
            <h3 class="showsRating">
-             Genres<span>: ${show.genres.join(` | `)}</span>
+             Genres<span>: ${show.genres.join(` | `) || `-`}</span>
            </h3>
           <h3 class="showsRating">
             Status<span>: ${show.status}</span>
@@ -182,7 +183,6 @@ function showShows(shows) {
   const titles = document.querySelectorAll(`.showsTitle`);
   const imgs = document.querySelectorAll(`.showsImg`);
   const listOfCast = document.querySelectorAll(`.showsRatingCast`);
-
   const clickOnShow = (e) => {
     const selectedShowId = e.target.dataset.id;
     episodeState.switcher = false;
@@ -221,6 +221,7 @@ function showShows(shows) {
 }
 
 function renderShows(shows) {
+  selectSortShow.classList.remove(`hideFilter`);
   selectEpisode.style.display = `none`;
   episodeState.switcher = true;
   const formattedSearchTerm = episodeState.searchEpisodes.toLocaleLowerCase();
@@ -254,13 +255,14 @@ function showEpisodes(episodes) {
     //rendering img
 
     const image = document.createElement(`img`);
-    if (episode.image) {
-      image.src = episode.image.medium;
-      divEpisodes.appendChild(image);
-    }
+
+    image.src =
+      episode.image?.medium ??
+      `data:image/png;base64,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`;
+    divEpisodes.appendChild(image);
 
     //rendering summary text
-    divEpisodes.innerHTML += episode.summary;
+    divEpisodes.innerHTML += episode.summary ?? `No description`;
   });
 }
 
@@ -268,19 +270,24 @@ function renderEpisodes(id) {
   if (!episodeState.allEpisodes) {
     return;
   }
+  selectSortShow.classList.add(`hideFilter`);
   selectEpisode.style.display = `inline`;
   episodeState.switcher = false;
   const formattedSearchTerm = episodeState.searchEpisodes.toLowerCase();
   // filter the episodes of the selected show
-  const filteredFilms = episodeState.allEpisodes[id].filter(
-    (film) =>
-      //Added RegExp to remove tags from the summary, as they affect the filter results.
-      film.name.toLowerCase().includes(formattedSearchTerm) ||
-      film.summary
-        .toLowerCase()
-        .replace(/<\/?p>|<br\s*\/?>/g, "")
-        .includes(formattedSearchTerm)
-  );
+  const filteredFilms = episodeState.allEpisodes[id].filter((film) => {
+    if (film.summary === null) {
+      return film.name.toLowerCase().includes(formattedSearchTerm);
+    } else {
+      return (
+        film.name.toLowerCase().includes(formattedSearchTerm) ||
+        film?.summary
+          .toLowerCase()
+          .replace(/<\/?p>|<br\s*\/?>/g, "")
+          .includes(formattedSearchTerm)
+      );
+    }
+  });
 
   if (filteredFilms.length === 0) {
     mainDiv.textContent = "";
@@ -326,7 +333,7 @@ function handleShowSelect(event) {
     }
   }
 }
-
+//filter shows
 selectSortShow.addEventListener(`change`, (e) => {
   const selectorValue = e.target.value;
   switch (selectorValue) {

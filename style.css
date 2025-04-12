@@ -118,3 +118,7 @@ body {
 .showsRatingCast:hover {
   text-decoration: underline;
 }
+
+.hideFilter {
+  opacity: 0;
+}
