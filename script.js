@@ -44,7 +44,6 @@ async function updateShows() {
   // data.sort((a, b) => a.name.localeCompare(b.name));
   const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
   episodeState.allShows = sortedData;
-  console.log(episodeState.allShows);
   populateShowSelector(episodeState.allShows);
   loadingImg.classList.remove(`loading`);
   renderShows([...episodeState.allShows].sort((a, b) => b.name.localeCompare(a.name)));
@@ -169,7 +168,7 @@ function showShows(shows) {
             Status<span>: ${show.status}</span>
           </h3>
           <h3 class="showsRating">
-            Runtime<span>: ${show.runtime}</span>
+            Runtime<span>: ${show.runtime || `-`}</span>
           </h3>
           <h3 class="showsRatingCast cursorPointer" data-id="${show.id}" >
             list of actors ➜
@@ -270,6 +269,7 @@ function renderEpisodes(id) {
   if (!episodeState.allEpisodes) {
     return;
   }
+  selectSortShow.selectedIndex = 0;
   selectSortShow.classList.add(`hideFilter`);
   selectEpisode.style.display = `inline`;
   episodeState.switcher = false;
@@ -306,12 +306,11 @@ function renderEpisodes(id) {
 searchBox.addEventListener("input", handleSearchInput);
 
 function handleSearchInput(event) {
+  episodeState.searchEpisodes = event.target.value.trim();
   if (!episodeState.switcher) {
-    episodeState.searchEpisodes = event.target.value.trim();
     renderEpisodes(selectShow.value);
   } else {
-    episodeState.searchEpisodes = event.target.value.trim();
-    renderShows(episodeState.allShows);
+    sortSwitcher();
   }
 }
 
@@ -321,9 +320,8 @@ function handleShowSelect(event) {
   const selectedShowId = event.target.value;
   episodeState.searchEpisodes = "";
   searchBox.value = "";
-  console.log(selectedShowId);
   if (selectedShowId === `111111`) {
-    renderShows(episodeState.allShows);
+    renderShows([...episodeState.allShows].sort((a, b) => b.name.localeCompare(a.name)));
   } else {
     if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
       //check if already we have the list of episodes of the selected show, and if no - fetch them
@@ -334,8 +332,10 @@ function handleShowSelect(event) {
   }
 }
 //filter shows
-selectSortShow.addEventListener(`change`, (e) => {
-  const selectorValue = e.target.value;
+selectSortShow.addEventListener(`change`, sortSwitcher);
+
+function sortSwitcher() {
+  const selectorValue = selectSortShow.value;
   switch (selectorValue) {
     case "up":
       const sortedAz = [...episodeState.allShows].sort((a, b) => b.name.localeCompare(a.name));
@@ -353,4 +353,4 @@ selectSortShow.addEventListener(`change`, (e) => {
       const sortedRatingDown = [...episodeState.allShows].sort((a, b) => b.rating.average - a.rating.average);
       renderShows(sortedRatingDown);
   }
-});
+}

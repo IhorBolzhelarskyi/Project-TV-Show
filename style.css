@@ -97,6 +97,9 @@ body {
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
+.shows {
+  max-width: 100%;
+}
 
 .show {
   opacity: 1;
