@@ -17,7 +17,7 @@ const searchBox = document.getElementById("searchbar");
 const footer = document.querySelector(`#footer`);
 const header = document.querySelector(`#search`);
 const selectSortShow = document.querySelector(`#sortShows`);
-// const summaryElement =
+const webSiteTitle = document.querySelector(`#webSiteTitle`);
 
 //---------fetching shows from the API---------
 const fetchShows = async function () {
@@ -71,10 +71,7 @@ async function updatingCastForShows(id) {
 }
 function renderCastForShows(id) {
   const castList = document.querySelector(`#cast${id}`);
-  console.log(castList);
-  // console.log(castList);
   const castArray = episodeState.allCast[id]?._embedded?.cast;
-  console.log(castArray);
   const seenName = new Set();
   castArray.forEach((actor) => {
     if (!seenName.has(actor.person.name)) {
@@ -151,7 +148,7 @@ function showShows(shows) {
   mainDiv.className = `mainDivShows-view`;
   shows.forEach((show) => {
     const html = `<section class="shows">
-        <div><h1 class="showsTitle cursorPointer" data-id="${show.id}">${show.name}</h1></div>
+        <div class="divShowsTitle"><h1 class="showsTitle cursorPointer" data-id="${show.id}">${show.name}</h1></div>
         <div class="showsContent">
         <div class="showsSummary">
           <img class="showsImg cursorPointer" data-id="${show.id}" src="${show.image.medium}" />
@@ -159,18 +156,18 @@ function showShows(shows) {
         </div>
         <div class="showsStatus">
           <h3 class="showsRating">
-            Rated<span>: ${show.rating.average ?? `-`}</span>
+            Rated<span class="ratingSpan">: ${show.rating.average ?? `-`}</span>
           </h3>
            <h3 class="showsRating">
-             Genres<span>: ${show.genres.join(` | `) || `-`}</span>
+             Genres<span class="ratingSpan">: ${show.genres.join(` | `) || `-`}</span>
            </h3>
           <h3 class="showsRating">
-            Status<span>: ${show.status}</span>
+            Status<span class="ratingSpan">: ${show.status}</span>
           </h3>
           <h3 class="showsRating">
-            Runtime<span>: ${show.runtime || `-`}</span>
+            Runtime<span class="ratingSpan">: ${show.runtime || `-`}</span>
           </h3>
-          <h3 class="showsRatingCast cursorPointer" data-id="${show.id}" >
+          <h3 class="showsRatingCast showsRating cursorPointer" data-id="${show.id}" >
             list of actors ➜
           </h3>
           <div id=cast${show.id} class="listOfCast hide"></div>
@@ -182,6 +179,32 @@ function showShows(shows) {
   const titles = document.querySelectorAll(`.showsTitle`);
   const imgs = document.querySelectorAll(`.showsImg`);
   const listOfCast = document.querySelectorAll(`.showsRatingCast`);
+  const summaryDivs = document.querySelectorAll(`.summaryText`);
+  //replacing multiple p elements in summary into one p
+  summaryDivs.forEach((div) => {
+    const allP = div.querySelectorAll(`p`);
+    const combinedP = [...allP].map((p) => p.textContent).join(` `);
+    allP.forEach((p) => p.remove());
+    const newP = document.createElement(`p`);
+    newP.textContent = combinedP;
+    //creating span read more for each summary
+    newP.className = `summaryShow`;
+    const span = document.createElement(`span`);
+    span.textContent = `...read more`;
+    span.className = `readMore`;
+    div.append(newP, span);
+    const lineHeight = parseFloat(getComputedStyle(newP).lineHeight);
+    const maxLines = 3;
+    const maxHeight = lineHeight * maxLines;
+    if (newP.scrollHeight > maxHeight) {
+      newP.classList.add("truncate");
+      span.style.display = "inline";
+      span.addEventListener(`click`, () => {
+        newP.classList.toggle("expanded");
+        span.textContent = newP.classList.contains("expanded") ? "collapse" : "... read more";
+      });
+    }
+  });
   const clickOnShow = (e) => {
     const selectedShowId = e.target.dataset.id;
     episodeState.switcher = false;
@@ -212,7 +235,6 @@ function showShows(shows) {
       } else {
         updatingCastForShows(castId);
       }
-      console.log(div);
       div.classList.toggle(`hide`);
       div.classList.toggle(`show`);
     });
@@ -321,6 +343,7 @@ function handleShowSelect(event) {
   episodeState.searchEpisodes = "";
   searchBox.value = "";
   if (selectedShowId === `111111`) {
+    selectSortShow.value = "up";
     renderShows([...episodeState.allShows].sort((a, b) => b.name.localeCompare(a.name)));
   } else {
     if (Object.keys(episodeState.allEpisodes).includes(selectedShowId)) {
@@ -354,3 +377,12 @@ function sortSwitcher() {
       renderShows(sortedRatingDown);
   }
 }
+
+//Back to main page functionality
+webSiteTitle.addEventListener(`click`, () => {
+  selectSortShow.value = "up";
+  episodeState.searchEpisodes = "";
+  searchBox.value = "";
+  const sortedAz = [...episodeState.allShows].sort((a, b) => b.name.localeCompare(a.name));
+  renderShows(sortedAz);
+});
