@@ -52,7 +52,7 @@ updateShows();
 // fetching cast data from API
 async function fetchCast(id) {
   try {
-    const response = await fetch(`http://api.tvmaze.com/shows/${id}?embed=cast`);
+    const response = await fetch(`https://api.tvmaze.com/shows/${id}?embed=cast`);
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
     }
